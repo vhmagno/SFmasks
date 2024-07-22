@@ -1,0 +1,838 @@
+{UTF-8}
+total cost=
+	sterilization cost+total discard cost-revenue of recycling
+	~	Real
+	~		|
+
+sterilization cost= INTEG (
+	(sterilization*sterilization cycle cost)+(sterilization cycle cost*non destructive treatment\
+		),
+		0)
+	~	Real
+	~		|
+
+distribution=
+	IF THEN ELSE(Stock of masks>0, demand for new masks, purchase+sterilization)
+	~	Masks/Month
+	~		|
+
+purchase=
+	IF THEN ELSE(Time<=3, 0.8*demand for new masks, demand for new masks)
+	~	Masks/Month
+	~		|
+
+unmet demand=
+	IF THEN ELSE((purchase+sterilization)>=demand for new masks, 0, (purchase+sterilization\
+		)-demand for new masks)
+	~	Masks/Month
+	~		|
+
+total discard cost=
+	total cost of incineration+total cost of landfilling
+	~	Real
+	~		|
+
+total cost of landfilling= INTEG (
+	landfilling*cost of lanffilling,
+		0)
+	~	Real
+	~		|
+
+total cost of incineration= INTEG (
+	incineration*cost of incineration,
+		0)
+	~	Real
+	~		|
+
+revenue of recycling=
+	revenue of aluminum recycling+revenue of polymers recycling
+	~	Real
+	~		|
+
+revenue of polymers recycling=
+	Amount of polymers*polymer Kg price
+	~	Real
+	~		|
+
+revenue of aluminum recycling=
+	aluminum Kg price*Amount of aluminum
+	~	Real
+	~		|
+
+discarded material=
+	total mass incinerated+total mass irregular discarded+total mass landfilling
+	~	Tons
+	~		|
+
+total mass irregular discarded=
+	mask mass*Total irregular discarded
+	~	Tons
+	~		|
+
+total mass incinerated=
+	mask mass*total incinerated
+	~	Tons
+	~		|
+
+total mass landfilling=
+	mask mass*Total landfilling
+	~	Tons
+	~		|
+
+CO2 emitted by irregular dicard= INTEG (
+	tons of CO2 emitted by irregular discarded mask*irregular discard,
+		0)
+	~	Tons
+	~		|
+
+irregular discard=
+	Discard masks*irregular discard rate
+	~	Masks/Month
+	~		|
+
+Total irregular discarded= INTEG (
+	irregular discard,
+		0)
+	~	Masks
+	~		|
+
+Total landfilling= INTEG (
+	landfilling,
+		0)
+	~	Masks
+	~		|
+
+Discard masks= INTEG (
+	discard-incineration-irregular discard-non destructive treatment,
+		0)
+	~	Masks
+	~		|
+
+CO2 emitted by masks landfilling= INTEG (
+	tons of CO2 emitted by mask landfilling*landfilling,
+		0)
+	~	Tons
+	~		|
+
+landfilling=
+	landfilling rate*Treated masks
+	~	Masks/Month
+	~		|
+
+Treated masks= INTEG (
+	non destructive treatment-landfilling-recycling,
+		0)
+	~	Masks
+	~		|
+
+incineration=
+	Discard masks*incineration rate
+	~	Masks/Month
+	~		|
+
+CO2 emitted by incineration= INTEG (
+	CO2 emited by a cycle of incineration*incineration,
+		0)
+	~	Tons
+	~		|
+
+cost of incineration=
+	0.020706
+	~	Real/Masks
+	~		|
+
+total incinerated= INTEG (
+	incineration,
+		0)
+	~	Masks
+	~		|
+
+demand for new masks=
+	-reuse+(number of health professionals*number of masks per professional per month)
+	~	Masks/Month
+	~		|
+
+rate of reuse=
+	IF THEN ELSE(time of reuse>0, 1-rate of discard-rate of sterilization, 0)
+	~	1/Month
+	~		|
+
+months stuck in sterilization=
+	0/30.437
+	~	Month
+	~		|
+
+aluminum recycling=
+	aluminum recycling rate*recycled mass
+	~	Kg/Month
+	~		|
+
+time of reuse=
+	5/30.437
+	~	Month
+	~		|
+
+total time of use=
+	((number of sterilization+1)*time of reuse+number of sterilization*months stuck in sterilization\
+		)+0.0328
+	~	Month
+	~		|
+
+number of sterilization=
+	0
+	~	Dmnl
+	~		|
+
+polymer recycling=
+	recycled mass*polymer recycling rate
+	~	Kg/Month
+	~		|
+
+rate of sterilization=
+	IF THEN ELSE(total time of use>0, number of sterilization/(total time of use*30.437)\
+		, 0)
+	~	1/Month
+	~		|
+
+rate of discard=
+	1/(total time of use*30.437)
+	~	1/Month
+	~		|
+
+number of health professionals:INTERPOLATE:
+	~	Professional
+	~	\!Months\!Professionals
+	|
+
+CO2 emitted by a cycle of non destructive treatment=
+	8.3e-07
+	~	Tons/Masks
+	~		|
+
+CO2 emitted by non destructive treatment= INTEG (
+	CO2 emitted by a cycle of non destructive treatment*non destructive treatment,
+		0)
+	~	Tons
+	~		|
+
+total CO2 emitted=
+	CO2 emitted by incineration+CO2 emitted by irregular dicard+CO2 emitted by sterilization\
+		+CO2 emitted by non destructive treatment+CO2 emitted by masks landfilling
+	~	Tons
+	~		|
+
+tons of CO2 emitted by mask landfilling=
+	3.42809e-06
+	~	Tons/Masks
+	~		|
+
+Stock of masks= INTEG (
+	(purchase+sterilization)-distribution,
+		0)
+	~	Masks
+	~		|
+
+CO2 emitted by sterilization= INTEG (
+	CO2 emitted by a cycle of sterilization*sterilization,
+		0)
+	~	Tons
+	~		|
+
+tons of CO2 emitted by irregular discarded mask=
+	3.42809e-06
+	~	Tons/Masks
+	~		|
+
+CO2 emited by a cycle of incineration=
+	0.0009021
+	~	Tons/Masks
+	~		|
+
+CO2 emitted by a cycle of sterilization=
+	8.3e-07
+	~	Tons/Masks
+	~		|
+
+cost of lanffilling=
+	0.020706
+	~	Real/Masks
+	~		|
+
+Amount of polymers= INTEG (
+	polymer recycling,
+		0)
+	~	Kg
+	~		|
+
+Amount of aluminum= INTEG (
+	aluminum recycling,
+		0)
+	~	Kg
+	~		|
+
+Masks for recycling= INTEG (
+	recycling,
+		0)
+	~	Masks
+	~		|
+
+sterilization cycle cost=
+	0.001323
+	~	Real/Masks
+	~		|
+
+aluminum Kg price=
+	7
+	~	Real/Kg
+	~		|
+
+aluminum recycling rate=
+	0.03
+	~	1/Month
+	~		|
+
+polymer recycling rate=
+	0.97
+	~	1/Month
+	~		|
+
+mask price=
+	11.74
+	~	Real/Masks
+	~		|
+
+purchase cost=
+	mask price*purchase
+	~	Real/Month
+	~		|
+
+mass of a mask=
+	0.0029
+	~	Kg/Masks
+	~		|
+
+non destructive treatment=
+	Discard masks*non destructive treatment rate
+	~	Masks/Month
+	~		|
+
+recycling=
+	Treated masks*recycling rate
+	~	Masks/Month
+	~		|
+
+landfilling rate=
+	1
+	~	1/Month
+	~		|
+
+non destructive treatment rate=
+	0.25
+	~	1/Month
+	~		|
+
+recycled mass=
+	Masks for recycling*mass of a mask
+	~	Kg
+	~		|
+
+polymer Kg price=
+	3.5
+	~	Real/Kg
+	~		|
+
+mask mass=
+	2.9e-06
+	~	Tons/Masks
+	~		|
+
+discarded mass=
+	Discard masks*mask mass
+	~	Tons
+	~		|
+
+recycling rate=
+	0
+	~	1/Month
+	~		|
+
+incineration rate=
+	0.418
+	~	1/Month
+	~		|
+
+irregular discard rate=
+	0.332
+	~	1/Month
+	~		|
+
+sterilization=
+	rate of sterilization*Used masks
+	~	Masks/Month
+	~		|
+
+Used masks= INTEG (
+	use-discard-reuse-sterilization,
+		0)
+	~	Masks
+	~		|
+
+discard=
+	rate of discard*Used masks
+	~	Masks/Month
+	~		|
+
+Masks in use= INTEG (
+	distribution-use+reuse,
+		0)
+	~	Masks
+	~		|
+
+number of masks per professional per month=
+	30.437
+	~	Masks/(Professional*Month)
+	~		|
+
+rate of use=
+	1
+	~	1/Month
+	~		|
+
+reuse=
+	rate of reuse*Used masks
+	~	Masks/Month
+	~		|
+
+use=
+	Masks in use*rate of use
+	~	Masks/Month
+	~		|
+
+********************************************************
+	.Control
+********************************************************~
+		Simulation Control Parameters
+	|
+
+FINAL TIME  = 30
+	~	Month
+	~	The final time for the simulation.
+	|
+
+INITIAL TIME  = 1
+	~	Month
+	~	The initial time for the simulation.
+	|
+
+SAVEPER  = 
+        TIME STEP
+	~	Month [0,?]
+	~	The frequency with which output is stored.
+	|
+
+TIME STEP  = 0.001
+	~	Month [0,?]
+	~	The time step for the simulation.
+	|
+
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 1
+$192-192-192,0,Arial Unicode MS|12||0-0-0|0-0-0|0-0-255|-1--1--1|255-255-255|96,96,84,0
+10,1,Stock of masks,-36,211,41,20,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,2,Masks in use,215,214,60,13,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,3,Used masks,478,213,58,13,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,4,6,1,100,0,0,22,0,192,0,-1--1--1,,1|(42,212)|
+1,5,6,2,4,0,0,22,0,192,0,-1--1--1,,1|(123,212)|
+11,6,0,84,212,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,7,distribution,84,233,51,13,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,8,10,2,100,0,0,22,0,192,0,-1--1--1,,1|(308,214)|
+1,9,10,3,4,0,0,22,0,192,0,-1--1--1,,1|(387,214)|
+11,10,0,348,214,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,11,use,348,242,40,20,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,12,14,3,100,0,0,22,0,192,0,-1--1--1,,1|(478,139)|
+1,13,14,2,4,0,0,22,0,192,0,-1--1--1,,1|(215,139)|
+11,14,0,364,139,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,15,reuse,364,167,40,20,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,16,Discard masks,690,213,38,20,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,17,19,3,100,0,0,22,0,192,0,-1--1--1,,1|(566,212)|
+1,18,19,16,4,0,0,22,0,192,0,-1--1--1,,1|(630,212)|
+11,19,0,602,212,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,20,discard,602,240,40,20,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,21,demand for new masks,193,290,54,20,8,3,0,4,-1,0,0,0,-1--1--1,193-235-255,|||0-0-0,0,0,0,0,0,0
+1,22,21,7,1,0,43,0,0,192,0,-1--1--1,,1|(143,277)|
+10,23,number of health professionals,185,369,63,27,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,24,number of masks per professional per month,73,364,63,34,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,25,rate of reuse,299,104,59,13,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,26,25,15,1,0,43,0,0,192,0,-1--1--1,,1|(327,111)|
+10,27,rate of discard,575,315,37,20,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,28,27,20,1,0,43,0,0,192,0,-1--1--1,,1|(583,269)|
+1,29,15,21,1,0,45,0,0,192,0,-1--1--1,,1|(367,268)|
+12,30,48,-202,206,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,31,33,30,100,0,0,22,0,192,0,-1--1--1,,1|(-164,206)|
+1,32,33,1,4,0,0,22,0,192,0,-1--1--1,,1|(-100,206)|
+11,33,0,-130,206,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,34,purchase,-130,227,45,13,40,3,0,4,-1,0,0,0,-1--1--1,255-255-147,|||0-0-0,0,0,0,0,0,0
+1,35,3,20,1,0,43,0,0,192,0,-1--1--1,,1|(542,246)|
+1,36,3,15,1,0,43,0,0,192,0,-1--1--1,,1|(424,167)|
+1,37,24,21,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,38,23,21,1,0,43,0,0,192,0,-1--1--1,,1|(190,332)|
+1,39,2,11,1,0,43,0,0,192,0,-1--1--1,,1|(311,233)|
+10,40,rate of use,299,283,51,13,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,41,40,11,1,0,43,0,0,192,0,-1--1--1,,1|(330,255)|
+1,42,44,3,100,0,0,22,0,192,0,-1--1--1,,1|(478,421)|
+1,43,44,1,4,0,0,22,0,192,0,-1--1--1,,1|(-36,421)|
+11,44,0,281,421,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,45,sterilization,281,442,52,13,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,46,rate of sterilization,237,498,52,20,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,47,46,45,1,0,43,0,0,192,0,-1--1--1,,1|(248,460)|
+1,48,3,45,1,0,43,0,0,192,0,-1--1--1,,1|(465,394)|
+10,49,Masks for recycling,675,663,62,21,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,50,Amount of aluminum,1071,715,49,20,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,51,Amount of polymers,1067,793,49,20,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,52,discarded mass,580,133,48,20,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,53,mask mass,568,59,54,13,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,54,53,52,1,0,43,0,0,192,0,-1--1--1,,1|(556,91)|
+1,55,16,52,1,0,43,0,0,192,0,-1--1--1,,1|(652,160)|
+10,56,recycled mass,675,754,42,20,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,57,49,56,1,0,43,0,0,192,0,-1--1--1,,1|(685,704)|
+10,58,unmet demand,47,128,40,20,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,59,21,58,1,0,43,0,0,192,0,-1--1--1,,1|(125,178)|
+10,60,purchase cost,-100,141,65,13,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,61,34,60,1,0,43,0,0,192,0,-1--1--1,,1|(-135,185)|
+10,62,sterilization cost,462,510,52,20,8,3,0,4,-1,0,0,0,-1--1--1,255-255-147,|||0-0-0,0,0,0,0,0,0
+1,63,45,62,1,0,43,0,0,192,0,-1--1--1,,1|(399,476)|
+10,64,revenue of recycling,1391,753,51,20,8,3,0,4,-1,0,0,0,-1--1--1,255-255-147,|||0-0-0,0,0,0,0,0,0
+10,65,irregular discard rate,804,311,55,20,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,66,recycling rate,785,649,62,13,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,67,incineration rate,780,56,53,20,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,68,polymer recycling rate,1014,878,62,20,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,69,aluminum recycling rate,832,750,62,20,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,70,mask price,-230,127,52,13,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,71,70,60,1,0,43,0,0,192,0,-1--1--1,,1|(-193,149)|
+10,72,sterilization cycle cost,524,445,52,20,8,3,0,4,-1,0,0,0,-1--1--1,255-255-255,|||0-0-0,0,0,0,0,0,0
+1,73,72,62,1,0,43,0,0,192,0,-1--1--1,,1|(484,490)|
+10,74,Treated masks,694,502,39,20,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,75,77,16,100,0,0,22,0,192,0,-1--1--1,,1|(690,317)|
+1,76,77,74,4,0,0,22,0,192,0,-1--1--1,,1|(690,447)|
+11,77,0,690,407,8,6,33,3,0,0,4,0,0,0,0,0,0,0,0,0
+10,78,non destructive treatment,750,407,52,27,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,79,81,74,100,0,0,22,0,192,0,-1--1--1,,1|(687,554)|
+1,80,81,49,4,0,0,22,0,192,0,-1--1--1,,1|(687,620)|
+11,81,0,687,592,8,6,33,3,0,0,4,0,0,0,0,0,0,0,0,0
+10,82,recycling,738,592,43,13,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,83,66,82,1,0,43,0,0,192,0,-1--1--1,,1|(751,594)|
+10,84,non destructive treatment rate,890,449,64,27,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,85,84,78,1,0,43,0,0,192,0,-1--1--1,,1|(812,413)|
+10,86,landfilling rate,837,588,63,13,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,87,16,78,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,88,74,82,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+10,89,mass of a mask,605,801,47,20,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,90,89,56,1,0,43,0,0,192,0,-1--1--1,,1|(641,763)|
+10,91,polymer Kg price,1131,852,64,20,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,92,aluminum Kg price,1105,660,51,20,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,93,CO2 emitted by incineration,893,46,72,20,8,3,0,4,-1,0,0,0,-1--1--1,188-255-185,|||0-0-0,0,0,0,0,0,0
+10,94,CO2 emitted by irregular dicard,1177,190,60,27,8,3,0,4,-1,0,0,0,-1--1--1,188-255-185,|||0-0-0,0,0,0,0,0,0
+10,95,total CO2 emitted,1352,243,46,20,8,3,0,4,-1,0,0,0,-1--1--1,188-255-185,|||0-0-0,0,0,0,0,0,0
+1,96,93,95,1,0,43,0,0,192,0,-1--1--1,,1|(1149,63)|
+1,97,94,95,1,0,43,0,0,192,0,-1--1--1,,1|(1273,190)|
+10,98,CO2 emitted by sterilization,360,553,65,20,8,3,0,4,-1,0,0,0,-1--1--1,188-255-185,|||0-0-0,0,0,0,0,0,0
+1,99,45,98,1,0,43,0,0,192,0,-1--1--1,,1|(315,500)|
+10,100,CO2 emitted by a cycle of sterilization,223,593,60,27,8,3,0,4,-1,0,0,0,-1--1--1,255-255-255,|||0-0-0,0,0,0,0,0,0
+1,101,100,98,1,0,43,0,0,192,0,-1--1--1,,1|(290,585)|
+12,102,48,791,792,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,103,48,796,704,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,104,Time,-223,286,38,13,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+1,105,107,103,100,0,0,22,0,192,0,-1--1--1,,1|(860,704)|
+1,106,107,50,4,0,0,22,0,192,0,-1--1--1,,1|(974,704)|
+11,107,0,920,704,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,108,aluminum recycling,920,732,46,20,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,109,69,108,1,0,43,0,0,192,0,-1--1--1,,1|(918,753)|
+1,110,112,102,100,0,0,22,0,192,0,-1--1--1,,1|(859,792)|
+1,111,112,51,4,0,0,22,0,192,0,-1--1--1,,1|(973,792)|
+11,112,0,923,792,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,113,polymer recycling,923,820,43,20,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,114,68,113,1,0,43,0,0,192,0,-1--1--1,,1|(965,894)|
+10,115,CO2 emitted by sterilization,1191,264,65,27,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+1,116,115,95,1,0,43,0,0,192,0,-1--1--1,,1|(1268,249)|
+10,117,cost of lanffilling,1213,434,50,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,118,cost of incineration,978,100,53,20,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,119,CO2 emited by a cycle of incineration,784,-16,59,27,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,120,119,93,1,0,43,0,0,192,0,-1--1--1,,1|(882,12)|
+10,121,tons of CO2 emitted by irregular discarded mask,1102,100,73,34,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,122,121,94,1,0,43,0,0,192,0,-1--1--1,,1|(1176,155)|
+10,123,demand for new masks,-274,278,60,20,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+10,124,CO2 emitted by masks landfilling,1085,593,60,27,8,3,0,4,-1,0,0,0,-1--1--1,188-255-185,|||0-0-0,0,0,0,0,0,0
+10,125,tons of CO2 emitted by mask landfilling,935,634,57,34,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,126,125,124,1,0,43,0,0,192,0,-1--1--1,,1|(1002,622)|
+1,127,124,95,1,0,43,0,0,192,0,-1--1--1,,1|(1317,424)|
+10,128,CO2 emitted by a cycle of non destructive treatment,1015,298,72,34,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,129,CO2 emitted by non destructive treatment,1182,335,60,34,8,3,0,4,-1,0,0,0,-1--1--1,188-255-185,|||0-0-0,0,0,0,0,0,0
+1,130,128,129,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,131,78,129,1,0,43,0,0,192,0,-1--1--1,,1|(958,355)|
+1,132,129,95,1,0,43,0,0,192,0,-1--1--1,,1|(1311,311)|
+10,133,Time,-368,105,38,13,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+10,134,number of health professionals,-399,138,66,25,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+10,135,number of sterilization,32,35,50,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,136,time of reuse,221,-20,59,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,137,months stuck in sterilization,97,-16,60,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,138,total time of use,158,85,53,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,139,135,138,1,0,43,0,0,192,0,-1--1--1,,1|(97,66)|
+1,140,136,138,1,0,43,0,0,192,0,-1--1--1,,1|(194,33)|
+1,141,137,138,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+10,142,total time of use,551,378,58,18,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+1,143,142,27,1,0,43,0,0,192,0,-1--1--1,,1|(532,341)|
+10,144,total time of use,53,533,58,18,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+10,145,number of sterilization,28,470,56,18,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+1,146,145,46,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,147,144,46,1,0,43,0,0,192,0,-1--1--1,,1|(155,532)|
+10,148,rate of discard,317,45,20,15,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+10,149,rate of sterilization,456,80,56,18,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+1,150,148,25,0,0,45,0,0,192,0,-1--1--1,,1|(0,0)|
+1,151,149,25,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,152,56,108,1,0,43,0,0,192,0,-1--1--1,,1|(796,723)|
+1,153,56,113,1,0,43,0,0,192,0,-1--1--1,,1|(793,808)|
+1,154,136,25,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,155,1,7,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,156,34,58,1,0,45,0,0,192,0,-1--1--1,,1|(-74,163)|
+10,157,total incinerated,679,43,50,23,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,158,160,16,100,0,0,22,0,192,0,-1--1--1,,1|(684,164)|
+1,159,160,157,4,0,0,22,0,192,0,-1--1--1,,1|(684,95)|
+11,160,0,684,129,8,6,33,3,0,0,4,0,0,0,0,0,0,0,0,0
+10,161,incineration,743,129,51,23,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,162,67,161,1,0,43,0,0,192,0,-1--1--1,,1|(783,131)|
+1,163,161,93,1,0,43,0,0,192,0,-1--1--1,,1|(867,91)|
+1,164,16,161,1,0,43,0,0,192,0,-1--1--1,,1|(756,165)|
+1,165,34,7,1,0,43,0,0,192,0,-1--1--1,,1|(-36,261)|
+10,166,Total irregular discarded,919,220,61,23,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,167,169,16,100,0,0,22,0,192,0,-1--1--1,,1|(765,215)|
+1,168,169,166,4,0,0,22,0,192,0,-1--1--1,,1|(836,215)|
+11,169,0,808,215,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,170,irregular discard,808,246,43,23,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,171,16,170,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,172,170,94,1,0,43,0,0,192,0,-1--1--1,,1|(916,253)|
+1,173,65,170,1,0,43,0,0,192,0,-1--1--1,,1|(791,268)|
+10,174,Total landfilling,959,503,43,23,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,175,177,74,100,0,0,22,0,192,0,-1--1--1,,1|(761,502)|
+1,176,177,174,4,0,0,22,0,192,0,-1--1--1,,1|(858,502)|
+11,177,0,795,502,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,178,landfilling,795,533,43,23,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,179,74,178,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,180,86,178,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,181,178,124,1,0,43,0,0,192,0,-1--1--1,,1|(913,568)|
+10,182,total mass incinerated,272,-155,50,23,8,3,1,0,-1,0,0,0,0,0,0,0,0,0
+10,183,total mass irregular discarded,454,-138,47,25,8,3,1,0,-1,0,0,0,0,0,0,0,0,0
+10,184,total mass landfilling,577,-139,47,23,8,3,1,0,-1,0,0,0,0,0,0,0,0,0
+1,185,53,182,1,1,0,0,0,192,0,-1--1--1,,1|(434,36)|
+1,186,53,183,1,1,0,0,0,192,0,-1--1--1,,1|(485,15)|
+1,187,53,184,1,1,0,0,0,192,0,-1--1--1,,1|(546,-20)|
+10,188,total incinerated,371,-96,55,18,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+10,189,Total irregular discarded,481,-75,51,25,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+10,190,Total landfilling,647,-68,48,18,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+1,191,188,182,0,1,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,192,189,183,0,1,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,193,190,184,0,1,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,194,discarded material,446,-251,46,23,8,3,1,0,-1,0,0,0,0,0,0,0,0,0
+1,195,182,194,0,1,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,196,183,194,0,1,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,197,184,194,0,1,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,198,21,34,1,0,43,0,0,192,0,-1--1--1,,1|(-88,265)|
+1,199,104,34,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,200,revenue of aluminum recycling,1242,710,49,25,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,201,revenue of polymers recycling,1244,799,49,25,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,202,92,200,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,203,50,200,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,204,51,201,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,205,91,201,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,206,200,64,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,207,201,64,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+10,208,total cost of incineration,1057,178,53,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,209,total cost of landfilling,1142,513,53,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,210,118,208,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,211,161,208,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,212,178,209,1,0,43,0,0,192,0,-1--1--1,,1|(1022,547)|
+1,213,117,209,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+10,214,total discard cost,1097,446,55,23,8,3,0,4,-1,0,0,0,-1--1--1,255-255-147,|||0-0-0,0,0,0,0,0,0
+10,215,total cost of incineration,1027,379,58,18,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+1,216,215,214,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,217,209,214,0,0,43,0,0,192,0,-1--1--1,,1|(0,0)|
+1,218,45,7,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,219,45,58,1,0,0,0,0,192,0,-1--1--1,,1|(17,360)|
+1,220,78,62,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,221,total cost,1477,546,43,23,8,3,0,4,-1,0,0,0,-1--1--1,255-255-147,|||0-0-0,0,0,0,0,0,0
+1,222,214,221,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,223,64,221,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,224,62,221,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+///---\\\
+:GRAPH Material_descartado
+:TITLE discarded material
+:SCALE
+:VAR discarded material
+:Y-MIN 0
+:Y-MAX 5000
+:DATASET S1 - Linear
+:LINE-WIDTH 1
+:VAR discarded material
+:Y-MIN 0
+:Y-MAX 5000
+:DATASET S2 - Recycling
+:LINE-WIDTH 2
+:VAR discarded material
+:Y-MIN 0
+:Y-MAX 5000
+:DATASET S3 - Reuse
+:LINE-WIDTH 1
+:VAR discarded material
+:Y-MIN 0
+:Y-MAX 5000
+:DATASET S4 - Reuse + sterilization
+:LINE-WIDTH 1
+:VAR discarded material
+:Y-MIN 0
+:Y-MAX 5000
+:DATASET S5 - Circular
+:LINE-WIDTH 1
+
+:GRAPH CO2_emitido
+:TITLE CO2 emitted
+:SCALE
+:VAR total CO2 emitted
+:Y-MIN 0
+:Y-MAX 650000
+:DATASET S1 - Linear
+:VAR total CO2 emitted
+:Y-MIN 0
+:Y-MAX 650000
+:DATASET S2 - Recycling
+:VAR total CO2 emitted
+:Y-MIN 0
+:Y-MAX 650000
+:DATASET S3 - Reuse
+:VAR total CO2 emitted
+:Y-MIN 0
+:Y-MAX 650000
+:DATASET S4 - Reuse + sterilization
+:VAR total CO2 emitted
+:Y-MIN 0
+:Y-MAX 650000
+:DATASET S5 - Circular
+
+:GRAPH demand
+:TITLE demand for new masks
+:SCALE
+:VAR demand for new masks
+:Y-MIN 0
+:Y-MAX 7.5e+07
+:DATASET S1 - Linear
+:VAR demand for new masks
+:Y-MIN 0
+:Y-MAX 7.5e+07
+:DATASET S2 - Recycling
+:VAR demand for new masks
+:Y-MIN 0
+:Y-MAX 7.5e+07
+:DATASET S3 - Reuse
+:VAR demand for new masks
+:Y-MIN 0
+:Y-MAX 7.5e+07
+:DATASET S4 - Reuse + sterilization
+:VAR demand for new masks
+:Y-MIN 0
+:Y-MAX 7.5e+07
+:DATASET S5 - Circular
+
+:GRAPH demanda_não_atendida
+:TITLE unmet demand
+:SCALE
+:VAR unmet demand
+:Y-MIN -1.2e+07
+:Y-MAX 0
+:DATASET S1 - Linear
+:VAR unmet demand
+:Y-MIN -1.2e+07
+:Y-MAX 0
+:DATASET S2 - Recycling
+:VAR unmet demand
+:Y-MIN -1.2e+07
+:Y-MAX 0
+:DATASET S3 - Reuse
+:VAR unmet demand
+:Y-MIN -1.2e+07
+:Y-MAX 0
+:DATASET S4 - Reuse + sterilization
+:VAR unmet demand
+:Y-MIN -1.2e+07
+:Y-MAX 0
+:DATASET S5 - Circular
+
+:GRAPH custo_de_compra
+:TITLE purchase cost
+:SCALE
+:VAR purchase cost
+:DATASET S1 - Linear
+:VAR purchase cost
+:DATASET S2 - Recycling
+:VAR purchase cost
+:DATASET S3 - Reuse
+:VAR purchase cost
+:DATASET S4 - Reuse + sterilization
+:VAR purchase cost
+:DATASET S5 - Circular
+
+:GRAPH custo_total_modelo
+:TITLE total cost
+:SCALE
+:VAR total cost
+:Y-MAX 3e+07
+:DATASET S1 - Linear
+:VAR total cost
+:Y-MAX 3e+07
+:DATASET S2 - Recycling
+:VAR total cost
+:Y-MAX 3e+07
+:DATASET S3 - Reuse
+:VAR total cost
+:Y-MAX 3e+07
+:DATASET S4 - Reuse + sterilization
+:VAR total cost
+:Y-MAX 3e+07
+:DATASET S5 - Circular
+:L<%^E!@
+1:S1 - Linear.vdfx
+1:S2 - Recycling.vdfx
+1:S3 - Reuse.vdfx
+1:S4 - Reuse + sterilization.vdfx
+1:S5 - Circular.vdfx
+1:tab1.vdfx
+4:Time
+5:total cost
+9:S3 - Reuse
+19:84,0
+24:1
+25:30
+26:30
+13:tab1.vdfx
+23:0
+15:0,0,0,0,0,0
+27:0,
+34:0,
+42:0
+72:0
+73:0
+95:0
+96:0
+97:0
+77:0
+78:0
+102:1
+93:0
+94:0
+92:0
+91:0
+90:0
+87:0
+75:
+43:
+103:8,8,8,3,8
+105:0,0,0,0,0,0,0,0,0,0
+104:Courier|12||0-0-0|0-0-0|-1--1--1|0-0-255|192-192-192|-1--1--1
